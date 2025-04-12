@@ -126,16 +126,16 @@ import { Cell } from "../interfaces/cell.interface";
   export function getVisibleCellsRange(difficulty: string, totalCells: number): { min: number, max: number } {
     switch (difficulty) {
       case 'beginner':
-        // return { min: 75, max: 79 }; for testing
+        // return { min: 75, max: 79 }; //for testing
         return { min: 36, max: 40 };
       case 'intermediate':
-        // return { min: 75, max: 79 }; for testing
+        // return { min: 75, max: 79 }; //for testing
         return { min: 32, max: 36 };
       case 'hard':
-        // return { min: 75, max: 79 }; for testing
+        // return { min: 75, max: 79 }; //for testing
         return { min: 28, max: 32 };
       case 'expert':
-        // return { min: 75, max: 79 }; for testing
+        // return { min: 75, max: 79 }; //for testing
         return { min: 24, max: 28 };
       default:
         return { min: 36, max: 40 }; // Default to beginner
