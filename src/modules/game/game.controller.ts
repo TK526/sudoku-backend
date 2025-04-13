@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CheckValueGameDto } from './dto/check-score-game.dto';
@@ -8,32 +8,33 @@ import { CheckGameInformationDto } from './dto/check-game-information.dto';
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
-  //Done
   @Post('create')
   create(@Body() createGameDto: CreateGameDto) {
+    Logger.log(`Entering create game endpoint, with body ${JSON.stringify(createGameDto)}`, GameController.name);
     return this.gameService.create(createGameDto);
   }
 
   @Post('completed')
   isGameCompleted(@Body() checkGameInfoDto: CheckGameInformationDto) {
+    Logger.log(`Entering isGameCompleted endpoint, with body ${JSON.stringify(checkGameInfoDto)}`, GameController.name);
     return this.gameService.isGameCompleted(checkGameInfoDto);
   }
 
-  //Done
   @Post('value')
   checkValue(@Body() checkValueGameDto: CheckValueGameDto) {
+    Logger.log(`Entering checkValue endpoint, with body ${JSON.stringify(checkValueGameDto)}`, GameController.name);
     return this.gameService.checkValue(checkValueGameDto);
   }
 
-  //Done
   @Post('hint')
   checkHintLimitAndReturnValue(@Body() CheckGameInformationDto: CheckGameInformationDto) {
+    Logger.log(`Entering checkHintLimitAndReturnValue endpoint, with body ${JSON.stringify(CheckGameInformationDto)}`, GameController.name);
     return this.gameService.checkHintLimitAndReturnValue(CheckGameInformationDto);
   }
 
-  //Done
   @Post('score')
   getScore(@Body() getScoreDto: CheckGameInformationDto) {
+    Logger.log(`Entering getScore endpoint, with body ${JSON.stringify(getScoreDto)}`, GameController.name);
     return this.gameService.getScore(getScoreDto);
   }
 }
