@@ -35,7 +35,7 @@ export class GameService {
     Logger.debug(`Generated Sudoku Grid (Solved)`, GameService.name);
     // Uncomment for visualising grid and hidden grid
     // grid.forEach((row, index) => {
-    //   console.log(`Row ${index + 1}: ${row.join(" | ")}`);
+    //   Logger.debug(`Row ${index + 1}: ${row.join(" | ")}`, GameService.name);
     // });
 
     // Create hidden grid based on difficulty
