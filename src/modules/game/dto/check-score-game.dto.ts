@@ -1,4 +1,4 @@
-import {IsString, IsInt, Min, Max, IsUUID, IsNotEmpty} from 'class-validator';
+import {IsInt, Min, Max, IsUUID, IsNotEmpty} from 'class-validator';
   
   export class CheckValueGameDto {
     @IsInt()

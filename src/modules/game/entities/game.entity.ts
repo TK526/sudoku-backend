@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-//can not store number[][] naturally on mySQL - need to use jsonTransformer and store as text
+// Can not store number[][] naturally on mySQL - mySQl supports scalar types + single arrays as JSON or text basically
+// Need to use jsonTransformer and parse to/from text
 const jsonTransformer = {
   to: (value: number[][]): string => JSON.stringify(value),
   from: (value: string): number[][] => JSON.parse(value),

@@ -1,7 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
-import { Cell } from './interfaces/cell.interface';
 import { 
   createCellGrid, 
   createEmptyGrid, 

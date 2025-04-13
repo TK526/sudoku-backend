@@ -39,6 +39,7 @@ export class GameController {
 }
 
 /**
+ * Backend breakdown for step by step
  * Create a 9 x 9 grid for a sudoku game
  * beginner difficulty means 36-40 cells visible
  * intermediate difficulty means 32-36 cells visible
