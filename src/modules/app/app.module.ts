@@ -5,7 +5,6 @@ import { GameModule } from '../game/game.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-
 @Module({
   imports: [
     GameModule,

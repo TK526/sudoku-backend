@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Record } from './entities/record.entity';
@@ -20,7 +20,11 @@ export class LeaderboardService {
     });
     
     // Add a new record to the database
-    await this.recordRepository.save(newRecord);
+    try {
+      await this.recordRepository.save(newRecord);
+    } catch (err) {
+      Logger.error(`Could not addRecord for record: ${JSON.stringify(record)}, with error: ${err}`, LeaderboardService.name);
+    }
     return newRecord;
   }
 
@@ -58,14 +62,21 @@ export class LeaderboardService {
 
   //helper function to get top 3 records based on difficulty
   async getTopRecordsByDifficulty(difficulty: string) {
-    return await this.recordRepository.find({
-      where: {
-        difficulty: difficulty,
-      },
-      order: {
-        score: 'DESC', // Order by score in descending order
-      },
-      take: 3, // Limit to top 3 records
-    });
+    let records: Record[] = [];
+    try {
+      records = await this.recordRepository.find({
+        where: {
+          difficulty: difficulty,
+        },
+        order: {
+          score: 'DESC', // Order by score in descending order
+        },
+        take: 3, // Limit to top 3 records
+      });
+    } catch (err) {
+      Logger.warn(`Could not find getTopRecordsByDifficulty for difficulty: ${difficulty}, with error: ${err}`, LeaderboardService.name);
+    }
+
+    return records;
   }
 }
