@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsIn, Min, Max, IsNotEmpty } from 'class-validator';
+import { IsString, IsInt, IsIn, Min, IsNotEmpty } from 'class-validator';
 
 export class RecordDto {
   @IsString()
@@ -7,7 +7,6 @@ export class RecordDto {
 
   @IsInt()
   @Min(0) // Score needs to be greater than 0
-  @Max(10000) // The maximum score
   score: number;
 
   @IsIn(['beginner', 'intermediate', 'hard', 'expert'])

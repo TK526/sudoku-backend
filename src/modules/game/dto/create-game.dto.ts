@@ -1,5 +1,4 @@
-import { IsString, IsInt, IsIn, Min, IsNotEmpty, Validate } from 'class-validator';
-import { IsPerfectSquareConstraint } from '../validator/custom-game.validator';
+import { IsString, IsInt, IsIn, Min, IsNotEmpty } from 'class-validator';
 
 export class CreateGameDto {
   @IsString()
@@ -9,6 +8,6 @@ export class CreateGameDto {
 
   @IsInt()
   @Min(3)
-  @Validate(IsPerfectSquareConstraint)
+  // @Validate(IsPerfectSquareConstraint) //Deprecated
   gridDimension: number;
 }
