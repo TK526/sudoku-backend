@@ -1,11 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateGameDto } from './dto/create-game.dto';
 import { 
-  createCellGrid, 
   createEmptyGrid, 
   solveSudoku,
   createHiddenGrid,
-  createCellGridWithHidden,
   countVisibleNumbers
 } from './utils/game.utils';
 import { Game } from './entities/game.entity';
@@ -34,26 +32,19 @@ export class GameService {
     // Use backtrack logic to bruteforce and create a grid
     solveSudoku(grid, gridDimension);
   
-    console.log("Generated Sudoku Grid:");
-    grid.forEach((row, index) => {
-      console.log(`Row ${index + 1}: ${row.join(" | ")}`);
-    });
-    
+    Logger.debug(`Generated Sudoku Grid (Solved)`, GameService.name);
+    // Uncomment for visualising grid and hidden grid
+    // grid.forEach((row, index) => {
+    //   Logger.debug(`Row ${index + 1}: ${row.join(" | ")}`, GameService.name);
+    // });
+
     // Create hidden grid based on difficulty
     const hiddenGrid = createHiddenGrid(grid, difficulty);
     
     // Count visible numbers
     const visibleCount = countVisibleNumbers(hiddenGrid);
     
-    console.log("Hidden Sudoku Grid:");
-    hiddenGrid.forEach((row, index) => {
-      console.log(`Row ${index + 1}: ${row.join(" | ")}`);
-    });
-    console.log(`Visible numbers: ${visibleCount}`);
-  
-    // Create cell grid with hidden values properly set
-    let cellGrid = createCellGridWithHidden(grid, hiddenGrid);
-    // console.log(JSON.stringify(cellGrid));
+    Logger.debug(`Generated Sudoku Grid (Hidden) with visible numbers: ${visibleCount}`, GameService.name);
     
     const newGame = this.gameRepository.create({
       grid: grid,
@@ -64,7 +55,6 @@ export class GameService {
       difficulty: difficulty,
       startedAt: new Date(),
       visibleValuesCount: visibleCount
-
     });
     
     // Add a new record to the database
@@ -85,7 +75,7 @@ export class GameService {
       throw new NotFoundException('Game not found');
     }    
     
-    //Note for self: user may send a value that is already mapped, but wont affect fe because no need to check values that are no previously 0
+    //Note for self: user may send a value that is already mapped, but wont affect fe because no need to check values that are not previously 0
     if(myGame.grid[checkValueGameDto.row][checkValueGameDto.column] === checkValueGameDto.value){
       //update the value on current grid
       myGame.currentGrid[checkValueGameDto.row][checkValueGameDto.column] = checkValueGameDto.value;
@@ -144,36 +134,31 @@ export class GameService {
       let correctRow;
       let correctColumn;
 
-      // Step 1: Find all empty cells (cells with value 0)
+      // Find all empty cells (cells with value 0)
       const emptyCells: { row: number, col: number }[] = [];
       for (let row = 0; row < myGame.currentGrid.length; row++) {
         for (let col = 0; col < myGame.currentGrid[row].length; col++) {
           if (myGame.currentGrid[row][col] === 0) {
-            emptyCells.push({ row, col });
+            emptyCells.push({ row, col }); // Storing the row and column indices of empty cells into new array
           }
         }
       }
-    
-      console.log("at start:", emptyCells.length);
-      console.log("at end: ", emptyCells.length - 1);
 
-      console.log("testing: " , emptyCells.length + myGame.visibleValuesCount);
-
-      // Step 2: If there are any empty cells, select one randomly
+      // If there are any empty cells, select one randomly
       if (emptyCells.length > 0) {
         const randomIndex = Math.floor(Math.random() * emptyCells.length);
         const { row, col } = emptyCells[randomIndex];
     
-        // Step 3: Get the correct value from the grid (the full, solved grid)
+        // Get the correct value from the grid (the full, solved grid)
         correctValue = myGame.grid[row][col];
         correctRow = row;
         correctColumn = col;
         
-        // Step 4: Update the currentGrid with the correct value
+        // Update the currentGrid with the correct value
         myGame.currentGrid[row][col] = correctValue;
       }
     
-      // Step 5: Save the updated game state (if necessary, depending on your setup)
+      // Save the updated game state
       myGame.hintsUsed++;
       myGame.visibleValuesCount++;
 
@@ -202,25 +187,36 @@ export class GameService {
     let currentTime = new Date();
   
     let correctScore = myGame.corrects * 5;
-    console.log(`Correct Score: ${correctScore}`);
+    Logger.debug(`Correct Score: ${correctScore}`, GameService.name);
   
     let errorScore = myGame.errors * 1;
-    console.log(`Error Score: ${errorScore}`);
+    Logger.debug(`Error Score: ${errorScore}`, GameService.name);
   
     let hintsNegativeScoring = 0; // Initialize to 0 to avoid undefined value
     for (let count = 0; count <= myGame.hintsUsed; count++) {
       hintsNegativeScoring = hintsNegativeScoring + 3 + count;
     }
-    console.log(`Hints Negative Scoring: ${hintsNegativeScoring}`);
-  
-    let timeDifferenceInSeconds = (currentTime.getTime() - myGame.startedAt.getTime()) / MS_IN_ONE_SECOND;
-    console.log(`Time Difference (seconds): ${timeDifferenceInSeconds}`);
-  
-    let timeBonus = Math.round(GRACE_POINTS - timeDifferenceInSeconds);
-    let totalScore = correctScore - (errorScore + hintsNegativeScoring) + (timeBonus > 0 ? timeBonus : 0);
+    Logger.debug(`Hints Negative Scoring: ${hintsNegativeScoring}`, GameService.name);
 
-    console.log(`Total Score: ${totalScore}`);
-  
+    // Calculate time difference in seconds
+    // Note: getTime() returns the time in milliseconds since 1970-01-01T00:00:00Z
+    // So we divide by 1000 to convert to seconds
+    let timeDifferenceInSeconds = (currentTime.getTime() - myGame.startedAt.getTime()) / MS_IN_ONE_SECOND;
+    Logger.debug(`Time Difference (seconds): ${timeDifferenceInSeconds}`, GameService.name);
+
+    // Calculate time bonus
+    // If timeDifferenceInSeconds is greater than GRACE_POINTS, no bonus is given
+    let timeBonus = Math.round(GRACE_POINTS - timeDifferenceInSeconds);
+    Logger.debug(`Time Bonus: ${timeBonus}`, GameService.name);
+
+    let totalScore = correctScore - (errorScore + hintsNegativeScoring) + (timeBonus > 0 ? timeBonus : 0);
+    Logger.debug(`Total Score: ${totalScore}`, GameService.name);
+
+    // Ensure totalScore is not negative
+    if (totalScore < 0) {
+      totalScore = 0;
+    }
+    
     return totalScore;
   }  
 
