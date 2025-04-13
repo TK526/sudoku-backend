@@ -1,7 +1,7 @@
 import { Cell } from "../interfaces/cell.interface";
 
   /**
-   * Check if number is valid based on Sudoku rules
+   * Check if number is valid based on Sudoku rules (no repeating in rows, cols, subgrids)
    * @param grid 
    * @param row 
    * @param col 
@@ -45,6 +45,7 @@ import { Cell } from "../interfaces/cell.interface";
     for (let row = 0; row < gridDimension; row++) {
       for (let col = 0; col < gridDimension; col++) {
         if (grid[row][col] === 0) {
+            //Create an array -> use to populate array with values/index values -> increment the values for 1-9 -> shuffle array
             const numbers = shuffleArray([...Array(gridDimension).keys()].map(n => n + 1));
 
             for (let num of numbers) {
@@ -92,7 +93,7 @@ import { Cell } from "../interfaces/cell.interface";
   }
 
   /**
-   * Creates an empty 2D list aka. Grid
+   * Creates an empty 2D list aka. Grid with all values set as 0
    * @param gridDimension 
    * @returns 
    */
@@ -106,6 +107,7 @@ import { Cell } from "../interfaces/cell.interface";
    * Maps 2D grid of number:number to 2D grid of Cell
    * @param grid 
    * @returns 
+   * @deprecated
    */
   export function createCellGrid(grid: number[][]) {
     const cellGrid: Cell[][] = grid.map(row =>
@@ -166,7 +168,7 @@ import { Cell } from "../interfaces/cell.interface";
     // Calculate how many cells to hide
     const cellsToHide = totalCells - visibleCells;
     
-    // Create a list of all positions in the grid
+    // Create a list of all positions in the grid (array of coordinates)
     const positions = [];
     for (let row = 0; row < gridDimension; row++) {
       for (let col = 0; col < gridDimension; col++) {
@@ -201,6 +203,7 @@ import { Cell } from "../interfaces/cell.interface";
    * @param grid Original complete grid
    * @param hiddenGrid Grid with hidden values (0s)
    * @returns Cell grid with proper hidden flags
+   * @deprecated
    */
   export function createCellGridWithHidden(grid: number[][], hiddenGrid: number[][]): Cell[][] {
     const cellGrid: Cell[][] = grid.map((row, rowIndex) =>
